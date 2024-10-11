@@ -28,7 +28,8 @@ async function createNewCsv(req, res, next) {
     console.log("New CSV file uploaded successfully!");
 
     // Proceed to the next middleware or response
-    req.s3CsvFileUrl = `https://mydemo-private.s3.ap-southeast-2.amazonaws.com/uploads/updated-csv/${fileName}`;
+      req.s3CsvFileUrl = `https://mydemo-private.s3.ap-southeast-2.amazonaws.com/uploads/updated-csv/${fileName}`;
+      req.requestId = requestID;
     next();
   } catch (err) {
     console.error("Error creating and uploading new CSV file:", err);
