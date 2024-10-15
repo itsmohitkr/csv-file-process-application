@@ -3,17 +3,23 @@ const sharp = require("sharp");
 const { putObjectUrl } = require("../../aws-config/config");
 
 async function uploadImageToS3(uploadUrl, imageBuffer) {
+  console.log("called");
+  
   try {
     const response = await axios.put(uploadUrl, imageBuffer, {
       headers: { "Content-Type": "image/jpeg" },
     });
+    console.log(response);
+    
     console.log("Image uploaded successfully:", response.data);
   } catch (error) {
     console.error("Error uploading image:", error);
   }
 }
 
-async function compressAndSaveImage(imageUrl, imageIndex) {
+async function compressAndSaveImage(imageUrl) {
+  console.log("Called");
+  
   try {
     const response = await axios({
       url: imageUrl,
@@ -30,7 +36,7 @@ async function compressAndSaveImage(imageUrl, imageIndex) {
       })
       .toBuffer();
 
-    const compressedImageFilename = `compressed-${imageIndex}-${Date.now()}.jpg`;
+    const compressedImageFilename = `compressed-${Date.now()}.jpg`;
     const uploadUrl = await putObjectUrl(compressedImageFilename, "image/jpeg");
     await uploadImageToS3(uploadUrl, compressedImage);
 
@@ -63,5 +69,5 @@ async function processImages(req, res, next) {
 }
 
 module.exports = {
-  processImages,
+  compressAndSaveImage,
 };

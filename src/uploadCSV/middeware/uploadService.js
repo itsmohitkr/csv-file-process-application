@@ -1,35 +1,38 @@
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const { v4: uuidv4 } = require("uuid");
+const { putObjectUrl } = require("../../aws-config/config");
+const { processS3Csv } = require("./csvParserService");
 
-const uploadDirectory = path.resolve(__dirname, "../../data/uploads/");
+async function saveFileLocally(req, res, next) {
+  const metadata = req.body;
+  if (metadata.filetype !== "text/csv") {
+    return next({
+      status: 400,
+      message: "File type must be .csv",
+    });
+  }
 
-if (!fs.existsSync(uploadDirectory)) {
-  fs.mkdirSync(uploadDirectory, { recursive: true }); // Create directory recursively if it doesn't exist
-}
+  const requestId = uuidv4();
+  const fileNameWithoutExtension = metadata.filename.endsWith(".csv")
+    ? metadata.filename.slice(0, -4)
+    : metadata.filename;
 
-// Set up multer storage configuration
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    return cb(null, uploadDirectory);
-  },
-  filename: function (req, file, cb) {
-    const filename = `${Date.now()}-${file.originalname}`;
-    return cb(null, filename);
-  },
-});
+  const filenameNew = `${fileNameWithoutExtension}-${requestId}.csv`;
+  const uploadUrl = await putObjectUrl(filenameNew, metadata.filetype);
 
-// Initialize multer with storage configuration
-const upload = multer({ storage });
-const uploadCsv = upload.single("mycsvfile");
+  res.json({ data: { requestId, uploadUrl, newFileName: filenameNew } });
 
-function saveFileLocally(req, res, next) {
-  uploadCsv(req, res, (err) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    next(); // Proceed to the next middleware
-  });
+  const objectKey = `uploads/original-csv/${filenameNew}`;
+  try {
+    setTimeout(async () => {
+      await processS3Csv("mydemo-private", objectKey);
+    }, 15000);
+  } catch (error) {
+    console.error("Error processing CSV:", error);
+    return next({
+      status: 500,
+      message: "Error processing CSV",
+    });
+  }
 }
 
 module.exports = {
