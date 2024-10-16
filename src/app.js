@@ -2,6 +2,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const morgan = require("morgan");
 
 
 
@@ -10,6 +11,8 @@ const retriveCSVrouter = require("./retriveCSV/retriveCSV.router");
 const snsRouter = require("./sns/sns.router");
 app.use(express.json());
 app.use(cors());
+
+app.use(morgan("tiny"));
 
 app.use("/upload-csv", uploadCSVrouter);
 app.use("/sns", snsRouter);
