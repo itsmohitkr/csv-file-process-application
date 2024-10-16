@@ -12,7 +12,7 @@ const snsRouter = require("./sns/sns.router");
 app.use(express.json());
 app.use(cors());
 
-app.use(morgan("tiny"));
+app.use(morgan("dev"));
 
 app.use("/upload-csv", uploadCSVrouter);
 app.use("/sns", snsRouter);
