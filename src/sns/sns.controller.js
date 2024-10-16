@@ -36,7 +36,9 @@ async function handleSnsMessage(req, res) {
     // Start processing the CSV (your existing function)
     processS3Csv(bucketName, objectKey);
   }
-
+  else {
+    res.status(404).send("error");  
+  }
 }
 
 
