@@ -1,5 +1,7 @@
 
 const express = require("express");
+app.use(express.text({ type: "text/plain" }));
+
 const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
