@@ -7,23 +7,33 @@ async function handleSnsMessage(req, res) {
     const messageType = req.headers["x-amz-sns-message-type"];
 
     if (messageType === "SubscriptionConfirmation") {
-      // Handle SubscriptionConfirmation
-      const message = req.body; // The body contains the actual SNS message
-      const confirmUrl = message.SubscribeURL;
+      // Debug to see the raw body
+      console.log("Raw SNS Body:", req.body);
+
+      const message = JSON.parse(req.body); // Parse the raw plain text body as JSON
+
+      const confirmUrl = message.SubscribeURL; // Extract SubscribeURL
       console.log("Confirming SNS Subscription:", confirmUrl);
 
-      try {
-        // Send an HTTP GET request to confirm the subscription
-        await axios.get(confirmUrl);
-        console.log("SNS Subscription Confirmed!");
-        res.status(200).send("Confirming SNS Subscription");
-      } catch (err) {
-        console.error("Error confirming subscription:", err);
-        throw new Error("Failed to confirm SNS subscription"); // Rethrow to catch below
+      if (confirmUrl) {
+        try {
+          // Send an HTTP GET request to confirm the subscription
+          await axios.get(confirmUrl);
+          console.log("SNS Subscription Confirmed!");
+          res.status(200).send("Confirming SNS Subscription");
+        } catch (err) {
+          console.error("Error confirming subscription:", err);
+          throw new Error("Failed to confirm SNS subscription"); // Rethrow to catch below
+        }
+      } else {
+        console.error("No SubscribeURL in message");
+        res
+          .status(400)
+          .send("No SubscribeURL found in SubscriptionConfirmation message");
       }
     } else if (messageType === "Notification") {
-      // Handle SNS Notification
-      const message = req.body; // The body contains the notification data
+      const message = JSON.parse(req.body); // Parse the raw plain text body as JSON
+
       console.log("SNS Notification Received:", message);
 
       try {
