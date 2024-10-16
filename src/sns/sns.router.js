@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const controller = require("./sns.controller");
 
-router.route("/").get(controller.confirm).post(controller.process);
+router.route("/").post(controller.handleSnsMessage);
 
 module.exports = router;
