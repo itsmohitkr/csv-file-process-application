@@ -15,6 +15,7 @@ async function handleSnsMessage(req, res) {
     } catch (err) {
       console.error("Error confirming subscription:", err);
     }
+    res.status(200).send("Confirming SNS Subscription");
   } else if (message && message.Type === "Notification") {
     // Handle SNS Notification
     console.log("SNS Notification Received:", message);
@@ -30,12 +31,12 @@ async function handleSnsMessage(req, res) {
       `New file uploaded to S3: ${objectKey} in bucket: ${bucketName}`
     );
     // Now update status as file uploaded and processing start to database
+    res.status(200).send("Received SNS notification");
 
     // Start processing the CSV (your existing function)
     processS3Csv(bucketName, objectKey);
   }
 
-  res.status(200).send("Received SNS message");
 }
 
 
