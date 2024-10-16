@@ -26,6 +26,8 @@ function confirm(req, res) {
 
 function process(req,res,next) {
   const message = req.body;
+  console.log(message);
+  
 
   // Check for Notification message type
   if (message && message.Type === "Notification") {
