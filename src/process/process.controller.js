@@ -26,8 +26,9 @@ async function startProcessingCsvFile(req, res, next) {
 
     // main function invocation
     await processS3Csv(bucketName, objectKey, next);
-    const newObjectKey = objectKey.replace("original-csv", "updated-csv");
-    const accessLink = `https://mydemo-private.s3.ap-southeast-2.amazonaws.com/${newObjectKey}`;
+    const realFileName = objectKey.replace("uploads/original-csv/", "");
+    // const newObjectKey = objectKey.replace("original-csv", "updated-csv");
+    const accessLink = `https://mydemo-private.s3.ap-southeast-2.amazonaws.com/uploads/updated-csv/new-updated-file-${realFileName}`;
 
     await service.update(objectKey, accessLink);
     res.status(200).send("CSV processed successfully");
