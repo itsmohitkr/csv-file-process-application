@@ -45,7 +45,7 @@ async function processS3Csv(bucketName, objectKey) {
         `uploads/updated-csv/new-updated-file.csv`
       );
 
-      // Clean up: delete the temp file
+      //delete the temp file
       fs.unlinkSync(tempFilePath);
       console.log("Temporary CSV file deleted.");
       console.log("Finished processing CSV and uploading to S3.");

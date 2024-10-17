@@ -8,7 +8,8 @@ async function create(req, res) {
 
     // Check if the file type is CSV
     if (metadata.filetype !== "text/csv") {
-      return res.status(400).json({
+      next({
+        status: 400,
         message: "File type must be .csv",
       });
     }
@@ -24,7 +25,7 @@ async function create(req, res) {
     const uploadUrl = await putObjectUrl(filenameNew, metadata.filetype);
 
     // Set status to indicate file has not been uploaded yet
-    const status = "File not uploaded yet";
+    const status = "File not uploaded yet to database.";
 
     // Store the requestId and status in the database (or any other service)
     await service.create(requestId, status);

@@ -4,13 +4,11 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const morgan = require("morgan");
-
-
-
 const uploadCSVrouter=require("./uploadCSV/uploadCSV.router")
 const retriveCSVrouter = require("./retriveCSV/retriveCSV.router");
-const processCsvRouter = require("./sns/sns.router");
-const { processS3Csv } = require("./sns/middleware/startProcessing");
+const processCsvRouter = require("./process/process.router");
+const notFound = require("./error/notFound");
+const errorHandler = require("./error/errorHandler");
 app.use(express.text({ type: "text/plain" }));
 
 app.use(express.json());
@@ -19,13 +17,11 @@ app.use(cors());
 app.use(morgan("dev"));
 
 app.use("/upload-csv", uploadCSVrouter);
-// app.use("/sns", snsRouter);
-app.use("/process-csv", async(req, res) => {
-    await processS3Csv(req.body.bucketName, req.body.objectKey);
-    res.status(200).send("csv processed");
-});
-
+app.use("/process-csv", processCsvRouter);
 app.use("/get-processed-csv", retriveCSVrouter);
+
+app.use(notFound);
+app.use(errorHandler)
 
 
 module.exports = app;

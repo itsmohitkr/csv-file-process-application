@@ -9,7 +9,7 @@ async function streamFromS3(bucketName, objectKey) {
     });
 
     const { Body } = await s3Client.send(command);
-    return Body; // This is a Readable stream
+    return Body; // this is a Readable stream
   } catch (error) {
     console.error("Error fetching object from S3:", error);
     throw error;
