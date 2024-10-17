@@ -27,7 +27,7 @@ async function getObjectUrl(key) {
 async function putObjectUrl(filename, contentType) {
   let key = "";
   if (contentType == "text/csv") {
-    key = `uploads/updated-csv/${filename}`;
+    key = `uploads/original-csv/${filename}`;
   } else {
     key = `uploads/user-images/${filename}`;
   }
@@ -44,4 +44,5 @@ async function putObjectUrl(filename, contentType) {
 module.exports = {
   getObjectUrl,
   putObjectUrl,
+  s3Client,
 };
