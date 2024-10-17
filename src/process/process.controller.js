@@ -1,9 +1,36 @@
 const axios = require("axios");
 const { processS3Csv } = require("./middleware/startProcessing");
 
-async function startProcessingCsvFile(req, res) {
-  await processS3Csv(req.body.bucketName, req.body.objectKey);
-  res.status(200).send("csv processed");
+async function startProcessingCsvFile(req, res, next) {
+  try {
+    const { bucketName, objectKey } = req.body;
+
+    if (
+      !bucketName ||
+      typeof bucketName !== "string" ||
+      bucketName.trim() === ""
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing bucketName." });
+    }
+
+    if (
+      !objectKey ||
+      typeof objectKey !== "string" ||
+      objectKey.trim() === ""
+    ) {
+      return res.status(400).json({ message: "Invalid or missing objectKey." });
+    }
+
+    // main function invocation
+    await processS3Csv(bucketName, objectKey, next);
+
+    res.status(200).send("CSV processed successfully");
+  } catch (error) {
+    console.error("error in startProcessingCsvFile:", error.message);
+    next(error);
+  }
 }
 
 module.exports = {

@@ -1,9 +1,8 @@
-// imageUtils.js
 
 const axios = require("axios");
 const sharp = require("sharp");
 const { Upload } = require("@aws-sdk/lib-storage");
-const { s3Client } = require("../../aws-config/config"); // Adjust the path as needed
+const { s3Client } = require("../../aws-config/config");
 
 async function compressAndUploadImage(imageUrl) {
   try {
@@ -25,7 +24,7 @@ async function compressAndUploadImage(imageUrl) {
       .toBuffer();
 
     // Generate a unique filename for the compressed image
-    const newFileName = `compressed-${Date.now()}.jpeg`;
+    const newFileName = `compressed-image-${Date.now()}.jpeg`;
 
     // Upload the compressed image to S3
     const upload = new Upload({

@@ -42,7 +42,7 @@ async function processS3Csv(bucketName, objectKey) {
       // Upload the temporary CSV to S3 using a presigned URL
       await uploadToPresignedUrl(
         bucketName,
-        `uploads/updated-csv/new-updated-file.csv`
+        `uploads/updated-csv/new-updated-file-${Date.now()}.csv`
       );
 
       //delete the temp file

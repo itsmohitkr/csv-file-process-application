@@ -9,7 +9,6 @@ const retriveCSVrouter = require("./retriveCSV/retriveCSV.router");
 const processCsvRouter = require("./process/process.router");
 const notFound = require("./error/notFound");
 const errorHandler = require("./error/errorHandler");
-app.use(express.text({ type: "text/plain" }));
 
 app.use(express.json());
 app.use(cors());
