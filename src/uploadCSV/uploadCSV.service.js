@@ -1,10 +1,10 @@
 const knex = require("../db/connection");
 const tableName = "requestTable";
 
-async function create(requestId, status) {
+async function create(requestId, status, objectKey) {
   try {
     const created = await knex(tableName)
-      .insert({ requestId, status })
+      .insert({ requestId, status, object_key: objectKey })
       .returning("*");
 
     return created[0]; // Return the created record

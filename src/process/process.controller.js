@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { processS3Csv } = require("./middleware/startProcessing");
+const service = require("./process.service");
 
 async function startProcessingCsvFile(req, res, next) {
   try {
@@ -25,7 +26,9 @@ async function startProcessingCsvFile(req, res, next) {
 
     // main function invocation
     await processS3Csv(bucketName, objectKey, next);
+    const accessLink = `https://mydemo-private.s3.ap-southeast-2.amazonaws.com/${objectKey}`;
 
+    await service.update(objectKey, accessLink);
     res.status(200).send("CSV processed successfully");
   } catch (error) {
     console.error("error in startProcessingCsvFile:", error.message);

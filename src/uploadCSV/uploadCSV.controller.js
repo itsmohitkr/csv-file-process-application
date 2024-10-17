@@ -2,9 +2,11 @@ const { v4: uuidv4 } = require("uuid");
 const { putObjectUrl } = require("../../src/aws-config/config");
 const service = require("./uploadCSV.service");
 
-async function create(req, res) {
+async function create(req, res,next) {
   try {
     const metadata = req.body;
+    console.log(metadata);
+    
 
     // Check if the file type is CSV
     if (metadata.filetype !== "text/csv") {
@@ -28,7 +30,8 @@ async function create(req, res) {
     const status = "File not uploaded yet to database.";
 
     // Store the requestId and status in the database (or any other service)
-    await service.create(requestId, status);
+    const objectKey = `uploads/original-csv/${filenameNew}`;
+    await service.create(requestId, status, objectKey);
 
     // Respond with the presigned URL and other relevant information
     res.json({
