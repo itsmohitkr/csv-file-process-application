@@ -40,10 +40,14 @@ async function processS3Csv(bucketName, objectKey) {
       outputStream.end(); // End the writable stream
 
       // Upload the temporary CSV to S3 using a presigned URL
-      const realFileName = objectKey.replace("uploads/original-csv/", "");
+      const realFileName = objectKey
+        .replace("uploads/original-csv/", "");
+       const fileNameWithoutExtension = realFileName.endsWith(".csv")
+         ? realFileName.slice(0, -4)
+         : realFileName;
       await uploadToPresignedUrl(
         bucketName,
-        `uploads/updated-csv/new-updated-file-${realFileName}.csv`
+        `uploads/updated-csv/new-updated-file-${fileNameWithoutExtension}.csv`
       );
 
       //delete the temp file
