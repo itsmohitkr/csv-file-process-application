@@ -5,6 +5,8 @@
 
 This project focuses on the full flow of processing CSV files and image handling, from file upload to image compression, storage in AWS S3, and returning processed results. The key features include:
 
+`Note`: To test the application, use a CSV file formatted as shown here: [Link to sample csv file](https://docs.google.com/spreadsheets/d/1Z_FfReSMCGYQajYKQwEt46LSO2rwVPywnY-ywxbeM60/edit?usp=sharing)
+
 1. **Frontend**: User interface for uploading CSV files and checking the status of processed files. (Deployed link:)[https://csv-file-processing-frontend.onrender.com]
 2. **Backend**: File upload handling, image processing, S3 integration, and database interaction.
 3. **Database**: PostgreSQL database for storing metadata and tracking `requestId`.
