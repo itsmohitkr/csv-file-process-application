@@ -8,7 +8,7 @@ async function isRequestExist(req, res, next) {
     res.locals.requestIdFound = requestIdFound;
     next(); 
   } else {
-    res.status(404).json({
+    return next({
       status: 404,
       message: `Invalid requestId: ${requestId}`,
     });
@@ -16,7 +16,13 @@ async function isRequestExist(req, res, next) {
 }
 
 function read(req, res) {
-  res.json({ data: res.locals.requestIdFound });
+  if (res.locals.requestIdFound.status === "ready to download") {
+    res.json({ data: res.locals.requestIdFound });
+    
+  }
+  else {
+    res.json({data:"Under process..."})
+  }
 }
 
 module.exports = {
