@@ -1,12 +1,16 @@
 
+
+
 ## Application Overview
 
-This project focuses on the full flow of processing CSV files and image handling, from file upload, image compression, and storage in AWS S3, to returning processed results. The application consists of the following key features:
+This project focuses on the full flow of processing CSV files and image handling, from file upload to image compression, storage in AWS S3, and returning processed results. The key features include:
 
-1. **Frontend**: User interface to upload CSVs and check the status of processed files.
-2. **Backend**: File upload handling, image processing, database interaction, and S3 integration.
-3. **Database**: A PostgreSQL database to store metadata and track `requestId`.
-4. **AWS S3**: Used for storing both original and processed images, as well as the processed CSV files.
+1. **Frontend**: User interface for uploading CSV files and checking the status of processed files. (Deployed link:)[https://csv-file-processing-frontend.onrender.com]
+2. **Backend**: File upload handling, image processing, S3 integration, and database interaction.
+3. **Database**: PostgreSQL database for storing metadata and tracking `requestId`.
+4. **AWS S3**: Used for storing both original and processed images, as well as CSV files.
+5. **Amazon SQS and SNS**: To handle file upload notifications and trigger the CSV processing flow.
+6. **AWS Lambda**: To trigger CSV processing when a file is uploaded to S3.
 
 ---
 
@@ -15,31 +19,46 @@ This project focuses on the full flow of processing CSV files and image handling
 1. **Frontend** (React with Bootstrap)
 2. **Backend** (Node.js, Express.js)
 3. **Database** (PostgreSQL via Knex.js)
-4. **AWS S3** (Amazon Web Services)
+4. **AWS S3, SNS, SQS, Lambda** (Amazon Web Services)
 
+---
 
 ## Application Workflow
 
 ![Alt text](./application-workflow.png)
 
 ### 1. **CSV File Upload**
-- The user first uploads a CSV file via the **FileUploadForm** in the frontend.
-- This form makes a `POST` request to the `/upload-csv` endpoint on the backend, using Axios. The file is sent in `multipart/form-data` format.
-- The file is received by the backend, where Multer handles the upload and saves the file temporarily on the server.
+- The user uploads a CSV file via the **FileUploadForm** in the frontend.
+- The frontend sends a `POST` request to `/upload-csv` on the backend, requesting a presigned URL for direct S3 upload.
+- The frontend then uses this presigned URL to upload the file directly to S3.
 
-### 2. **CSV Parsing & Image Processing**
-- After the file is uploaded, the backend parses the CSV. It extracts the image URLs from the CSV file.
-- For each image URL, the backend fetches the image, compresses it by 50% using the `sharp` library, and uploads the compressed image to AWS S3. This offloads the file storage and ensures that the compressed images are accessible via S3 URLs.
-- A new CSV file is generated with the updated image URLs pointing to the compressed images on S3.
+### 2. **Notification and File Processing**
+- Once the file is uploaded to S3, **SNS** sends a notification to **SQS**, which in turn triggers an **AWS Lambda** function.
+- The Lambda function calls the backend route `/process-csv` to start processing the uploaded file.
+- The backend retrieves the file from S3, parses the CSV, and processes the image URLs in the file.
 
-### 3. **Storing Metadata and Returning Request ID**
-- Once the processing is complete, the metadata (such as the `requestId` and the updated CSV file URL) is stored in the PostgreSQL database.
-- A unique `requestId` is generated and sent back to the user in the response. The `requestId` can be used later to check the status or download the processed file.
+### 3. **Stream-based CSV Processing**
+- The application uses a streaming approach to read the data directly from S3, improving efficiency for large files.
+- Each processed chunk is stored in a temporary file on the server.
+- Once the stream completes, the application uploads the processed CSV file to S3 and generates an access link.
 
-### 4. **Checking Status of Processed CSV**
-- Users can enter their `requestId` in the **RequestIdForm** in the frontend.
-- This form sends a `GET` request to `/get-processed-csv/:requestId` on the backend.
-- The backend queries the database using Knex.js to check if the `requestId` exists. If found, the backend returns the URL of the processed CSV file stored in S3.
-- The frontend then displays a button or link for the user to download the processed CSV file.
+### 4. **Storing Metadata and Generating Access Link**
+- After processing, the download link for the updated CSV is stored in the PostgreSQL database along with the `requestId`.
+- The temporary file on the server is deleted after the upload to S3 is complete.
+
+### 5. **Retrieving Processed CSV**
+- Users can use their `requestId` to check the status or download the processed CSV file.
+- The frontend sends a `GET` request to `/get-processed-csv/:requestId`, and if the processing is complete, the backend returns the updated CSV file's S3 download link.
 
 ---
+
+## Summary of Architecture
+
+- **S3** is used for file storage.
+- **SNS** notifies **SQS** about file uploads, triggering a **Lambda** function.
+- The backend uses streams to read the CSV file from S3 while processing it, stores processed chunks in a temporary local file, and upon completion, uploads the new CSV to S3.
+- The processed file link is saved in the database and can be retrieved via the `requestId`.
+
+---
+
+This architecture ensures a scalable and efficient system for handling large CSV files and image processing.

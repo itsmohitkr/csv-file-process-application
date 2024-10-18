@@ -5,10 +5,9 @@ const { streamFromS3 } = require("./s3Utils");
 const { processRow } = require("./csvUtils");
 const { uploadToPresignedUrl } = require("./uploadToUrl");
 
-
 async function processS3Csv(bucketName, objectKey) {
   const s3Stream = await streamFromS3(bucketName, objectKey);
-  const tempFilePath = path.join(__dirname, "temp-processed.csv"); 
+  const tempFilePath = path.join(__dirname, "temp-processed.csv");
   const outputStream = fs.createWriteStream(tempFilePath);
   let headerWritten = false;
 
@@ -40,11 +39,11 @@ async function processS3Csv(bucketName, objectKey) {
       outputStream.end(); // End the writable stream
 
       // Upload the temporary CSV to S3 using a presigned URL
-      const realFileName = objectKey
-        .replace("uploads/original-csv/", "");
-       const fileNameWithoutExtension = realFileName.endsWith(".csv")
-         ? realFileName.slice(0, -4)
-         : realFileName;
+      const realFileName = objectKey.replace("uploads/original-csv/", "");
+      const fileNameWithoutExtension = realFileName.endsWith(".csv")
+        ? realFileName.slice(0, -4)
+        : realFileName;
+      
       await uploadToPresignedUrl(
         bucketName,
         `uploads/updated-csv/new-updated-file-${fileNameWithoutExtension}.csv`
