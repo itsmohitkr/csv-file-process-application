@@ -3,6 +3,7 @@ require("dotenv").config();
 const path = require("path");
 const {
   DATABASE_URL_DEVELOPMENT,
+  DATABASE_URL,
   USER_NAME,
   DATABASE_PASSWORD,
   DATABASE_NAME,
